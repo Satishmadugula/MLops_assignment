@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/2025/personals/MLOPS/Assignment/mlruns/575618634735532810/7daba29b0b484967a0bb9f2f21cb99c0/artifacts
+end_time: 1756526572107
+entry_point_name: ''
+experiment_id: '575618634735532810'
+lifecycle_stage: active
+run_id: 7daba29b0b484967a0bb9f2f21cb99c0
+run_name: Wine Quality VotingClassifier_RF_GB_XGB
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1756526571419
+status: 4
+tags: []
+user_id: satish.madugula

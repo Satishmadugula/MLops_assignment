@@ -48,7 +48,10 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
-
+# Save the fitted scaler to a pickle file
+scaler_filename = 'Wine_quality_scaler.pkl'
+pickle.dump(scaler, open(scaler_filename, 'wb'))
+mlflow.log_artifact(scaler_filename, "Wine_quality_scaler")
 
 print(X_train.shape, X_test.shape)
 
@@ -103,99 +106,99 @@ print(X_train.shape, X_test.shape)
 
 
 
-# ## random forest
-# params = {
-#     "n_estimators":35,
-#     "criterion": "gini",
-#     "random_state": 42,
-# }
-# model = RandomForestClassifier(**params)
-
-# model.fit(X_train,y_train)
-
-# y_pred=model.predict(X_test)
-# #print(classification_report(y_pred,y_test))
-# report_dict = classification_report(y_test, y_pred, output_dict=True)
-# print("*"*75)
-# print("*"*75)
-# print(report_dict.keys())
-# print("*"*75)
-# print("*"*75)
-# with mlflow.start_run():
-#     mlflow.set_tag("author","Satish")
-#     mlflow.log_params(params)
-#     mlflow.log_metrics({
-#         'accuracy': report_dict['accuracy'],
-#         'recall_class_3': report_dict['3']['recall'],
-#         'recall_class_4': report_dict['4']['recall'],
-#         'recall_class_5': report_dict['5']['recall'],
-#         'recall_class_6': report_dict['6']['recall'],
-#         'recall_class_7': report_dict['7']['recall'],
-#         'recall_class_8': report_dict['8']['recall'],
-#         'f1_score_macro': report_dict['macro avg']['f1-score']
-#     })
-#     filename = r'Wine_quality_voting_classifier.pkl'
-#     pickle.dump(model, open(filename, 'wb'))
-#     # Log the model file as an artifact
-#     mlflow.log_artifact(filename, "Wine Quality Randome Forest Model")
-# print(report_dict)
-
-
-
-##n xgboost
-
-# ## XGBClassifier
-
-le = LabelEncoder()
-y_train_enc = le.fit_transform(y_train)   # maps {3,4,5,6,7,8} -> {0..5}
-y_test_enc  = le.transform(y_test)
-
-num_classes = len(le.classes_)  # 6
-
+## random forest
 params = {
-    "learning_rate":0.1,
- "n_estimators":1000,
- "max_depth":5,
- "min_child_weight":1,
- "gamma":0,
- "subsample":0.8,
- "colsample_bytree":0.8,
- "objective": 'multi:softprob',
- "nthread":4,
- "scale_pos_weight":1,
- "seed":27
+    "n_estimators":35,
+    "criterion": "gini",
+    "random_state": 42,
 }
-model = XGBClassifier(**params)
+model = RandomForestClassifier(**params)
 
-model.fit(X_train,y_train_enc)
+model.fit(X_train,y_train)
 
-y_pred_enc = model.predict(X_test)
-y_pred = le.inverse_transform(y_pred_enc)
-
-print(classification_report(y_pred,y_test))
+y_pred=model.predict(X_test)
+#print(classification_report(y_pred,y_test))
 report_dict = classification_report(y_test, y_pred, output_dict=True)
-# print("*"*75)
-# print("*"*75)
-# print(report_dict.keys())
-# print("*"*75)
-# print("*"*75)
+print("*"*75)
+print("*"*75)
+print(report_dict.keys())
+print("*"*75)
+print("*"*75)
 with mlflow.start_run():
     mlflow.set_tag("author","Satish")
     mlflow.log_params(params)
     mlflow.log_metrics({
         'accuracy': report_dict['accuracy'],
+        'recall_class_3': report_dict['3']['recall'],
+        'recall_class_4': report_dict['4']['recall'],
+        'recall_class_5': report_dict['5']['recall'],
+        'recall_class_6': report_dict['6']['recall'],
+        'recall_class_7': report_dict['7']['recall'],
+        'recall_class_8': report_dict['8']['recall'],
         'f1_score_macro': report_dict['macro avg']['f1-score']
     })
-  # Log per-class recall dynamically using original class names
-    for cls in le.classes_:
-        cls_key = str(cls)
-        if cls_key in report_dict:
-            mlflow.log_metric(f"recall_class_{cls_key}", report_dict[cls_key]["recall"])
-
-    filename = r'Wine_quality_XGBOOST_classifier.pkl'
+    filename = r'Wine_quality_Random_forest_classifier.pkl'
     pickle.dump(model, open(filename, 'wb'))
     # Log the model file as an artifact
-    mlflow.log_artifact(filename, "Wine_quality_XGBOOST_classifier")
+    mlflow.log_artifact(filename, "Wine Quality Randome Forest Model")
 print(report_dict)
+
+
+
+# ##n xgboost
+
+# # ## XGBClassifier
+
+# le = LabelEncoder()
+# y_train_enc = le.fit_transform(y_train)   # maps {3,4,5,6,7,8} -> {0..5}
+# y_test_enc  = le.transform(y_test)
+
+# num_classes = len(le.classes_)  # 6
+
+# params = {
+#     "learning_rate":0.1,
+#  "n_estimators":1000,
+#  "max_depth":5,
+#  "min_child_weight":1,
+#  "gamma":0,
+#  "subsample":0.8,
+#  "colsample_bytree":0.8,
+#  "objective": 'multi:softprob',
+#  "nthread":4,
+#  "scale_pos_weight":1,
+#  "seed":27
+# }
+# model = XGBClassifier(**params)
+
+# model.fit(X_train,y_train_enc)
+
+# y_pred_enc = model.predict(X_test)
+# y_pred = le.inverse_transform(y_pred_enc)
+
+# print(classification_report(y_pred,y_test))
+# report_dict = classification_report(y_test, y_pred, output_dict=True)
+# # print("*"*75)
+# # print("*"*75)
+# # print(report_dict.keys())
+# # print("*"*75)
+# # print("*"*75)
+# with mlflow.start_run():
+#     mlflow.set_tag("author","Satish")
+#     mlflow.log_params(params)
+#     mlflow.log_metrics({
+#         'accuracy': report_dict['accuracy'],
+#         'f1_score_macro': report_dict['macro avg']['f1-score']
+#     })
+#   # Log per-class recall dynamically using original class names
+#     for cls in le.classes_:
+#         cls_key = str(cls)
+#         if cls_key in report_dict:
+#             mlflow.log_metric(f"recall_class_{cls_key}", report_dict[cls_key]["recall"])
+
+#     filename = r'Wine_quality_XGBOOST_classifier.pkl'
+#     pickle.dump(model, open(filename, 'wb'))
+#     # Log the model file as an artifact
+#     mlflow.log_artifact(filename, "Wine_quality_XGBOOST_classifier")
+# print(report_dict)
 
 
